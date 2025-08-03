@@ -112,24 +112,39 @@ RunService.Heartbeat:Connect(function()
 	end
 end)
 
--- ✅ UI Button for phone & PC
-local milkGui = Instance.new("ScreenGui")
-milkGui.Name = "MilkButtonGui"
+-- ✅ GUI with Button + Title (Draggable)
+local milkGui = Instance.new("ScreenGui", PlayerGui)
+milkGui.Name = "MilkGUI"
 milkGui.ResetOnSpawn = false
-milkGui.Parent = PlayerGui
+
+local holder = Instance.new("Frame")
+holder.Size = UDim2.new(0, 130, 0, 60)
+holder.Position = UDim2.new(0, 20, 0.5, -30)
+holder.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+holder.BackgroundTransparency = 0.3
+holder.Active = true
+holder.Draggable = true
+holder.Parent = milkGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 20)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 0
+title.Text = "By Flazed"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
+title.Parent = holder
 
 milkBtn = Instance.new("TextButton")
-milkBtn.Size = UDim2.new(0, 120, 0, 40)
-milkBtn.Position = UDim2.new(0, 20, 0.5, -20)
+milkBtn.Size = UDim2.new(1, 0, 0, 40)
+milkBtn.Position = UDim2.new(0, 0, 0, 20)
 milkBtn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
 milkBtn.TextColor3 = Color3.new(0, 0, 0)
 milkBtn.Font = Enum.Font.GothamBold
 milkBtn.TextSize = 18
 milkBtn.Text = "Cum: OFF"
-milkBtn.Draggable = true
-milkBtn.Active = true
-milkBtn.Visible = true
-milkBtn.Parent = milkGui
+milkBtn.Parent = holder
 
 milkBtn.MouseButton1Click:Connect(function()
 	if not milkOn then
@@ -143,7 +158,7 @@ milkBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- 🅼 key also works
+-- 🅼 key support
 UIS.InputBegan:Connect(function(input, gpe)
 	if gpe then return end
 	if input.KeyCode == Enum.KeyCode.M then
