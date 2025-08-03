@@ -1,0 +1,152 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
+local UIS = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local RightHand = Character:FindFirstChild("RightHand") or Character:WaitForChild("RightHand")
+
+-- 🍌 Banana
+local banana = Instance.new("Part")
+banana.Size = Vector3.new(0.4, 0.4, 2.5)
+banana.Color = Color3.fromRGB(197, 140, 133)
+banana.Material = Enum.Material.SmoothPlastic
+banana.Anchored = false
+banana.CanCollide = false
+banana.Massless = true
+banana.Name = "Banana"
+banana.Parent = Character
+
+local bananaWeld = Instance.new("Weld")
+bananaWeld.Part0 = HumanoidRootPart
+bananaWeld.Part1 = banana
+bananaWeld.C0 = CFrame.new(0, -0.7, -1.5)
+bananaWeld.Parent = banana
+
+-- 🥜 Balls
+local function createBall(name, xOffset)
+	local ball = Instance.new("Part")
+	ball.Name = name
+	ball.Shape = Enum.PartType.Ball
+	ball.Size = Vector3.new(0.5, 0.5, 0.5)
+	ball.Color = Color3.fromRGB(197, 140, 133)
+	ball.Material = Enum.Material.SmoothPlastic
+	ball.Anchored = false
+	ball.CanCollide = false
+	ball.Massless = true
+	ball.Parent = Character
+
+	local weld = Instance.new("Weld")
+	weld.Part0 = banana
+	weld.Part1 = ball
+	weld.C0 = CFrame.new(xOffset, -0.4, 1.25)
+	weld.Parent = ball
+end
+
+createBall("Ball1", -0.25)
+createBall("Ball2", 0.25)
+
+-- 🥛 Milk Logic
+local milkOn = false
+local milkStartTime = 0
+local lastDrop = 0
+
+local function spawnMilk(pos, vel, size)
+	local milk = Instance.new("Part")
+	milk.Size = Vector3.new(size, size, size)
+	milk.Shape = Enum.PartType.Ball
+	milk.Color = Color3.new(1, 1, 1)
+	milk.Material = Enum.Material.Neon
+	milk.Anchored = false
+	milk.CanCollide = false
+	milk.Position = pos
+	milk.Velocity = vel
+	milk.Parent = workspace
+	Debris:AddItem(milk, 2)
+end
+
+-- Move hand to rub
+local function rubBanana()
+	local originalCFrame = RightHand.CFrame
+	local rubWeld = Instance.new("Weld")
+	rubWeld.Part0 = banana
+	rubWeld.Part1 = RightHand
+	rubWeld.C0 = CFrame.new(0, 0, 1.1)
+	rubWeld.Parent = RightHand
+
+	local startTime = tick()
+	local rubConn
+	rubConn = RunService.Heartbeat:Connect(function()
+		local elapsed = tick() - startTime
+		if elapsed > 3 then
+			rubConn:Disconnect()
+			rubWeld:Destroy()
+			RightHand.CFrame = originalCFrame
+			return
+		end
+		local offset = math.sin(tick() * 10) * 0.1
+		rubWeld.C0 = CFrame.new(0, offset, 1.1)
+	end)
+end
+
+-- Milk spawn handler
+RunService.Heartbeat:Connect(function()
+	if not milkOn then return end
+	local now = tick()
+	local elapsed = now - milkStartTime
+	if elapsed > 7 then
+		milkOn = false
+		if milkBtn then milkBtn.Text = "Cum: OFF" end
+		return
+	end
+
+	local tip = banana.Position + banana.CFrame:VectorToWorldSpace(Vector3.new(0, -0.2, -1.25))
+	local interval = elapsed >= 5 and 0.3 or 0.07
+	if now - lastDrop >= interval then
+		lastDrop = now
+		local speed = elapsed >= 5 and 25 or 65
+		spawnMilk(tip, banana.CFrame.lookVector * speed, 0.25)
+	end
+end)
+
+-- ✅ UI Button for phone & PC
+local milkGui = Instance.new("ScreenGui")
+milkGui.Name = "MilkButtonGui"
+milkGui.ResetOnSpawn = false
+milkGui.Parent = PlayerGui
+
+milkBtn = Instance.new("TextButton")
+milkBtn.Size = UDim2.new(0, 120, 0, 40)
+milkBtn.Position = UDim2.new(0, 20, 0.5, -20)
+milkBtn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+milkBtn.TextColor3 = Color3.new(0, 0, 0)
+milkBtn.Font = Enum.Font.GothamBold
+milkBtn.TextSize = 18
+milkBtn.Text = "Cum: OFF"
+milkBtn.Draggable = true
+milkBtn.Active = true
+milkBtn.Visible = true
+milkBtn.Parent = milkGui
+
+milkBtn.MouseButton1Click:Connect(function()
+	if not milkOn then
+		rubBanana()
+		task.delay(3, function()
+			milkOn = true
+			milkStartTime = tick()
+			lastDrop = 0
+			milkBtn.Text = "Cum: ON"
+		end)
+	end
+end)
+
+-- 🅼 key also works
+UIS.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.M then
+		milkBtn:Activate()
+	end
+end)
