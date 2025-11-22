@@ -9,7 +9,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local RightHand = Character:FindFirstChild("RightHand") or Character:WaitForChild("RightHand")
 
--- 🍌 Banana
+--  Banana
 local banana = Instance.new("Part")
 banana.Size = Vector3.new(0.4, 0.4, 2.5)
 banana.Color = Color3.fromRGB(197, 140, 133)
@@ -26,7 +26,7 @@ bananaWeld.Part1 = banana
 bananaWeld.C0 = CFrame.new(0, -0.7, -1.5)
 bananaWeld.Parent = banana
 
--- 🥜 Balls
+--  Balls
 local function createBall(name, xOffset)
 	local ball = Instance.new("Part")
 	ball.Name = name
@@ -49,7 +49,7 @@ end
 createBall("Ball1", -0.25)
 createBall("Ball2", 0.25)
 
--- 🥛 Milk Logic
+--  Milk Logic
 local milkOn = false
 local milkStartTime = 0
 local lastDrop = 0
@@ -112,7 +112,7 @@ RunService.Heartbeat:Connect(function()
 	end
 end)
 
--- ✅ GUI with Button + Title (Draggable)
+--  GUI with Button + Title (Draggable)
 local milkGui = Instance.new("ScreenGui", PlayerGui)
 milkGui.Name = "MilkGUI"
 milkGui.ResetOnSpawn = false
@@ -158,7 +158,7 @@ milkBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- 🅼 key support
+--  key support
 UIS.InputBegan:Connect(function(input, gpe)
 	if gpe then return end
 	if input.KeyCode == Enum.KeyCode.M then
